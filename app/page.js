@@ -1,4 +1,16 @@
+"use client"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 export default function Home() {
+  const router = useRouter()
+  const [text, setText] = useState("")
+
+  const createTree = () => {
+    if (text.trim() === "") return
+    router.push(`/generate?handle=${text}`)
+  }
+
   return (
     <main>
       <section className="min-h-screen overflow-hidden bg-[#d2e823] px-5 pb-14 pt-28 sm:px-8 sm:pb-16 sm:pt-32 lg:flex lg:items-center lg:px-10 lg:py-24 xl:px-16">
@@ -16,19 +28,26 @@ export default function Home() {
               Instagram, TikTok, Twitter, YouTube and other social media profiles.
             </p>
 
-            <form className="mt-1 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:items-center" action="#">
+            <form
+              className="mt-1 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:items-center"
+              action="#"
+              onSubmit={(e) => { e.preventDefault(); createTree() }}
+            >
               <label htmlFor="linktree-handle" className="sr-only">
                 Choose your Linktree handle
               </label>
               <input
                 id="linktree-handle"
+                value={text}
+                onChange={(e) => { setText(e.target.value) }}
                 className="min-w-0 flex-1 rounded-xl border border-transparent bg-white px-4 py-4 text-base text-gray-900 outline-none transition focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20"
                 type="text"
                 placeholder="linktr.ee/yourname"
               />
               <button
                 type="submit"
-                className="shrink-0 rounded-full bg-green-600 px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-800 focus:ring-offset-2 focus:ring-offset-[#d2e823] sm:px-7"
+                disabled={text.trim() === ""}
+                className="shrink-0 rounded-full bg-green-600 px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-800 focus:ring-offset-2 focus:ring-offset-[#d2e823] disabled:cursor-not-allowed disabled:bg-gray-400 disabled:hover:bg-gray-400 sm:px-7"
               >
                 Get started for free
               </button>
@@ -45,8 +64,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="min-h-screen bg-red-700">
-
+      <section className="flex min-h-screen items-center justify-center bg-red-700">
+        <div className="text-center text-4xl font-bold text-white sm:text-6xl">
+          Future Updates...
+        </div>
       </section>
     </main>
   )

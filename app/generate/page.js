@@ -1,50 +1,74 @@
 'use client'
+import { Suspense, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import { useSearchParams } from 'next/navigation';
 
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+const GenerateInner = () => {
+    const searchParams = useSearchParams()
+    const [links, setLinks] = useState([{ link: "", linktext: "" }])
+    const [handle, setHandle] = useState(searchParams.get('handle') || "")
+    const [pic, setPic] = useState("")
+    const [desc, setDesc] = useState("")
 
-const Generate = () => {
-    // const addLink = () => {
-    //     const myHeaders = new Headers();
-    //     myHeaders.append("Content-Type", "application/json");
+    const handleChange = (index, link, linktext) => {
+        setLinks((initialLinks) => {
+            return initialLinks.map((item, i) => {
+                if (i === index) {
+                    return { link, linktext }
+                }
+                return item
+            })
+        })
+    }
 
-    //     const raw = JSON.stringify({
-    //         "link": "https://www.facebook.com/codewithharry",
-    //         "linktext": "Facebook",
-    //         "action": "add",
-    //         "handle": "codewithharry"
-    //     });
+    const lastLink = links[links.length - 1]
+    const canAddLink = lastLink.link.trim() !== "" && lastLink.linktext.trim() !== ""
 
-    //     const requestOptions = {
-    //         method: "POST",
-    //         headers: myHeaders,
-    //         body: raw,
-    //         redirect: "follow"
-    //     };
+    const addLink = () => {
+        if (!canAddLink) {
+            toast.warn("Fill in the current link before adding another")
+            return
+        }
+        setLinks(links.concat([{ link: "", linktext: "" }]))
+    }
 
-    //     fetch("http://localhost:3000/api/generate", requestOptions)
-    //         .then((response) => response.text())
-    //         .then((result) => console.log(result))
-    //         .catch((error) => console.error(error));
-    // }
+    const submitLinks = async () => {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
 
-    const notify = () => {
-        toast.success('Wow so easy!')
+        const raw = JSON.stringify({
+            "links": links,
+            "handle": handle,
+            "pic": pic,
+            "desc": desc
+        });
+
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+
+        const r = await fetch("/api/add", requestOptions);
+        const result = await r.json();
+
+        if (result.success) {
+            toast.success(result.message)
+            setLinks([{ link: "", linktext: "" }])
+            setHandle("")
+            setPic("")
+            setDesc("")
+        } else {
+            toast.error(result.message)
+        }
     }
 
     return (
         <>
-            <button
-                type="button"
-                onClick={() => toast.success('Toast is working!')}
-                className="relative z-[60] mt-24 h-10 w-24 border bg-yellow-500 text-black"
-            >
-                Notify!
-            </button>
-            <ToastContainer position="top-center" autoClose={3000} />
-
+            <ToastContainer />
             <main className="min-h-0 flex-1 overflow-y-auto bg-[#e9c0e9] lg:overflow-hidden">
-                <div className="mx-auto grid min-h-full w-full max-w-7xl grid-cols-1 lg:h-full lg:grid-cols-2">
+                <div className="mt-6 mx-auto grid min-h-full w-full max-w-7xl grid-cols-1 lg:h-full lg:grid-cols-2">
                     <section className="min-w-0 p-6 mt-16 sm:p-8 lg:overflow-y-auto lg:px-12 lg:py-10">
                         <div className="mx-auto max-w-xl">
                             <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
@@ -58,7 +82,9 @@ const Generate = () => {
                                     </h2>
 
                                     <input
-                                        className="mt-3 w-full rounded-xl border border-transparent bg-white px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                                        value={handle}
+                                        onChange={(e) => { setHandle(e.target.value) }}
+                                        className="mt-3 w-full rounded-xl border border-transparent bg-white px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-rose-600 focus:ring-2 focus:ring-rose-200"
                                         type="text"
                                         placeholder="Choose a handle"
                                     />
@@ -69,23 +95,32 @@ const Generate = () => {
                                         Step 2: Add links
                                     </h2>
 
-                                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                                        <input
-                                            className="min-w-0 rounded-xl border border-transparent bg-white px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
-                                            type="text"
-                                            placeholder="Enter link text"
-                                        />
+                                    {links && links.map((item, index) => {
+                                        return (
+                                            <div key={index} className="mt-3 grid gap-3 sm:grid-cols-2">
+                                                <input
+                                                    value={item.linktext || ""}
+                                                    onChange={(e) => { handleChange(index, item.link, e.target.value) }}
+                                                    className="min-w-0 rounded-xl border border-transparent bg-white px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-rose-600 focus:ring-2 focus:ring-rose-200"
+                                                    type="text"
+                                                    placeholder="Enter link text"
+                                                />
 
-                                        <input
-                                            className="min-w-0 rounded-xl border border-transparent bg-white px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
-                                            type="url"
-                                            placeholder="Enter link URL"
-                                        />
-                                    </div>
+                                                <input
+                                                    value={item.link || ""}
+                                                    onChange={(e) => { handleChange(index, e.target.value, item.linktext) }}
+                                                    className="min-w-0 rounded-xl border border-transparent bg-white px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-rose-600 focus:ring-2 focus:ring-rose-200"
+                                                    type="url"
+                                                    placeholder="Enter link URL"
+                                                />
+                                            </div>
+                                        )
+                                    })}
 
-                                    <button
+                                    <button onClick={() => { addLink() }}
                                         type="button"
-                                        className="mt-3 rounded-full bg-slate-900 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-700"
+                                        disabled={!canAddLink}
+                                        className="mt-3 rounded-full bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-md shadow-slate-900/20 transition hover:bg-slate-800 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none"
                                     >
                                         + Add link
                                     </button>
@@ -98,21 +133,27 @@ const Generate = () => {
 
                                     <div className="mt-3 space-y-3">
                                         <input
-                                            className="w-full rounded-xl border border-transparent bg-white px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                                            value={pic}
+                                            onChange={(e) => { setPic(e.target.value) }}
+                                            className="w-full rounded-xl border border-transparent bg-white px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-rose-600 focus:ring-2 focus:ring-rose-200"
                                             type="url"
                                             placeholder="Enter link to your picture"
                                         />
 
                                         <input
-                                            className="w-full rounded-xl border border-transparent bg-white px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                                            value={desc}
+                                            onChange={(e) => { setDesc(e.target.value) }}
+                                            className="w-full rounded-xl border border-transparent bg-white px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-rose-600 focus:ring-2 focus:ring-rose-200"
                                             type="text"
                                             placeholder="Enter description"
                                         />
                                     </div>
 
                                     <button
+                                        onClick={() => { submitLinks() }}
+                                        disabled={pic === "" || handle === "" || links[0].linktext === ""}
                                         type="button"
-                                        className="mt-5 w-full rounded-full bg-pink-700 px-6 py-3.5 font-bold text-white transition hover:bg-pink-800 sm:w-auto"
+                                        className="mt-5 w-full rounded-full bg-rose-800 px-6 py-3.5 font-bold text-white shadow-lg shadow-rose-900/30 transition hover:bg-rose-900 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none sm:w-auto"
                                     >
                                         Create your BitTree
                                     </button>
@@ -131,6 +172,14 @@ const Generate = () => {
                 </div>
             </main>
         </>
+    )
+}
+
+const Generate = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <GenerateInner />
+        </Suspense>
     )
 }
 
