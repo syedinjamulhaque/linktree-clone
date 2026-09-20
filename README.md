@@ -1,36 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Bittree
+
+A Linktree clone built with Next.js and MongoDB — create a personal "link in bio" page and share it with a single link.
+
+Built as a follow-along project (based on CodeWithHarry's Linktree clone tutorial) with custom design and responsiveness updates.
+
+## Features
+
+- Landing page with a "Get started for free" flow — type a handle and get redirected to the generator
+- Generator page (`/generate`) to build a Bittree profile:
+  - Claim a handle
+  - Add multiple links (with add/validate flow)
+  - Add a profile picture and description
+- Dynamic public profile pages at `/[handle]` — e.g. `yoursite.com/harry`
+- Animated, staggered link reveal on profile pages (pop-in effect)
+- MongoDB Atlas as the backend database
+- Fully responsive across mobile, tablet, and desktop
+- Toast notifications for save success/failure (`react-toastify`)
+
+## Tech Stack
+
+- **Framework:** Next.js (App Router)
+- **Styling:** Tailwind CSS
+- **Font:** Poppins (Google Fonts)
+- **Database:** MongoDB (Atlas)
+- **Notifications:** react-toastify
+
+## Project Structure
+
+```
+app/
+  page.js                  # Landing page
+  layout.js                # Root layout (fonts, navbar)
+  generate/
+    page.js                # Handle + links + pic/desc form
+  [handle]/
+    page.js                # Public dynamic profile page
+  api/
+    add/
+      route.js             # Saves a new Bittree document to MongoDB
+    generate/
+      route.js             # (if applicable) supporting API logic
+
+components/
+  Navbar.js                # Top navigation bar
+
+lib/
+  mongodb.js                # MongoDB client connection helper
+```
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone the repo
+
+```bash
+git clone <your-repo-url>
+cd bittree
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Set up MongoDB Atlas
+
+1. Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2. Under **Database Access**, create a database user with a username and password.
+3. Under **Network Access**, allow access from anywhere (`0.0.0.0/0`) — required since deployment platforms like Vercel don't use fixed IPs.
+4. Under **Connect → Drivers**, copy your connection string. It should look like:
+
+```
+mongodb+srv://<username>:<password>@<cluster-url>/bittree?retryWrites=true&w=majority
+```
+
+Make sure `/bittree` is included in the path so it points to the right database.
+
+### 4. Configure environment variables
+
+Create a `.env.local` file in the project root:
+
+```
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/bittree?retryWrites=true&w=majority
+```
+
+> `.env.local` is gitignored by default in Next.js — never commit your real connection string.
+
+### 5. Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Deployment (Vercel)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Push your repo to GitHub.
+2. Import the project into [Vercel](https://vercel.com/new).
+3. During setup, add the `MONGODB_URI` environment variable in the **Environment Variables** section before deploying.
+4. Deploy.
 
-## Learn More
+If you add or change environment variables *after* the first deploy, you'll need to trigger a redeploy — Vercel doesn't apply new env vars to existing deployments automatically.
 
-To learn more about Next.js, take a look at the following resources:
+## How It Works
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. A user enters a handle on the homepage and is redirected to `/generate?handle=<value>`.
+2. On the generate page, they fill in their links, profile picture URL, and description, then submit.
+3. The form sends a `POST` request to `/api/add`, which saves a new document to the `links` collection in MongoDB.
+4. On success, a "View your Bittree" button appears, linking to `/<handle>` — the public profile page.
+5. The `/[handle]` page fetches the matching document from MongoDB and renders the profile with animated link cards.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Handle uniqueness validation (preventing duplicate handles) should be enforced in `/api/add` — check before inserting.
+- This project intentionally skips some production concerns (auth, handle-availability checks, image uploads) to stay focused on the core Next.js + MongoDB flow.
