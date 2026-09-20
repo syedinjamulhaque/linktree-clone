@@ -9,7 +9,7 @@ A Linktree clone built with Next.js and MongoDB — create a personal "link in b
   - Claim a handle
   - Add multiple links (with add/validate flow)
   - Add a profile picture and description
-- Dynamic public profile pages at `/[handle]` — e.g. `yoursite.com/harry`
+- Dynamic public profile pages at `/[handle]` — e.g. `yoursite.com/johndoe`
 - Animated, staggered link reveal on profile pages (pop-in effect)
 - MongoDB Atlas as the backend database
 - Fully responsive across mobile, tablet, and desktop
