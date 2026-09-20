@@ -2,8 +2,6 @@
 
 A Linktree clone built with Next.js and MongoDB — create a personal "link in bio" page and share it with a single link.
 
-Built as a follow-along project (based on CodeWithHarry's Linktree clone tutorial) with custom design and responsiveness updates.
-
 ## Features
 
 - Landing page with a "Get started for free" flow — type a handle and get redirected to the generator
@@ -115,3 +113,7 @@ If you add or change environment variables *after* the first deploy, you'll need
 
 - Handle uniqueness validation (preventing duplicate handles) should be enforced in `/api/add` — check before inserting.
 - This project intentionally skips some production concerns (auth, handle-availability checks, image uploads) to stay focused on the core Next.js + MongoDB flow.
+
+## Credits
+
+- Design reference: [Linktree](https://linktr.ee)
