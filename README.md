@@ -1,8 +1,12 @@
-# Bittree
+# 🔗 BitTree
 
-A Linktree clone built with Next.js and MongoDB — create a personal "link in bio" page and share it with a single link.
+A Linktree clone built with **Next.js** and **MongoDB** — create a personal "link in bio" page and share it with a single link.
 
-## Features
+🔗 **Live Demo:** [linktree-clone-iota-amber.vercel.app](https://linktree-clone-iota-amber.vercel.app/)
+
+---
+
+## ✨ Features
 
 - Landing page with a "Get started for free" flow — type a handle and get redirected to the generator
 - Generator page (`/generate`) to build a Bittree profile:
@@ -15,17 +19,23 @@ A Linktree clone built with Next.js and MongoDB — create a personal "link in b
 - Fully responsive across mobile, tablet, and desktop
 - Toast notifications for save success/failure (`react-toastify`)
 
-## Tech Stack
+---
 
-- **Framework:** Next.js (App Router)
-- **Styling:** Tailwind CSS
-- **Font:** Poppins (Google Fonts)
-- **Database:** MongoDB (Atlas)
-- **Notifications:** react-toastify
+## 🛠️ Tech Stack
 
-## Project Structure
+| Category | Tools |
+|---|---|
+| **Framework** | Next.js (App Router) |
+| **Styling** | Tailwind CSS |
+| **Font** | Poppins (Google Fonts) |
+| **Database** | MongoDB (Atlas) |
+| **Notifications** | react-toastify |
 
-```
+---
+
+## 📂 Project Structure
+
+```text
 app/
   page.js                  # Landing page
   layout.js                # Root layout (fonts, navbar)
@@ -46,13 +56,15 @@ lib/
   mongodb.js                # MongoDB client connection helper
 ```
 
-## Getting Started
+---
+
+## 🚀 Getting Started
 
 ### 1. Clone the repo
 
 ```bash
-git clone <your-repo-url>
-cd bittree
+git clone https://github.com/syedinjamulhaque/linktree-clone.git
+cd linktree-clone
 ```
 
 ### 2. Install dependencies
@@ -68,7 +80,7 @@ npm install
 3. Under **Network Access**, allow access from anywhere (`0.0.0.0/0`) — required since deployment platforms like Vercel don't use fixed IPs.
 4. Under **Connect → Drivers**, copy your connection string. It should look like:
 
-```
+```text
 mongodb+srv://<username>:<password>@<cluster-url>/bittree?retryWrites=true&w=majority
 ```
 
@@ -78,11 +90,11 @@ Make sure `/bittree` is included in the path so it points to the right database.
 
 Create a `.env.local` file in the project root:
 
-```
+```env
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/bittree?retryWrites=true&w=majority
 ```
 
-> `.env.local` is gitignored by default in Next.js — never commit your real connection string.
+> **Important:** `.env.local` is gitignored by default in Next.js — never commit your real connection string.
 
 ### 5. Run the dev server
 
@@ -92,16 +104,20 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000).
 
-## Deployment (Vercel)
+---
+
+## ☁️ Deployment (Vercel)
 
 1. Push your repo to GitHub.
 2. Import the project into [Vercel](https://vercel.com/new).
 3. During setup, add the `MONGODB_URI` environment variable in the **Environment Variables** section before deploying.
 4. Deploy.
 
-If you add or change environment variables *after* the first deploy, you'll need to trigger a redeploy — Vercel doesn't apply new env vars to existing deployments automatically.
+> If you add or change environment variables *after* the first deploy, you'll need to trigger a redeploy — Vercel doesn't apply new env vars to existing deployments automatically.
 
-## How It Works
+---
+
+## 🔄 How It Works
 
 1. A user enters a handle on the homepage and is redirected to `/generate?handle=<value>`.
 2. On the generate page, they fill in their links, profile picture URL, and description, then submit.
@@ -109,11 +125,23 @@ If you add or change environment variables *after* the first deploy, you'll need
 4. On success, a "View your Bittree" button appears, linking to `/<handle>` — the public profile page.
 5. The `/[handle]` page fetches the matching document from MongoDB and renders the profile with animated link cards.
 
-## Notes
+---
+
+## 📝 Notes
 
 - Handle uniqueness validation (preventing duplicate handles) should be enforced in `/api/add` — check before inserting.
 - This project intentionally skips some production concerns (auth, handle-availability checks, image uploads) to stay focused on the core Next.js + MongoDB flow.
 
-## Credits
+---
+
+## 🙌 Credits
 
 - Design reference: [Linktree](https://linktr.ee)
+
+---
+
+## 👨‍💻 Author
+
+**Syed Injamul Haque**
+
+- GitHub: [@syedinjamulhaque](https://github.com/syedinjamulhaque)
